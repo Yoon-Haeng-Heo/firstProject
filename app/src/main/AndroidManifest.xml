@@ -11,13 +11,18 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ListActivity"></activity>
-        <activity android:name=".MainActivity">
+        <activity android:name=".SplashActivity"
+            android:theme="@style/SplashTheme">
             <intent-filter>
+                // 프로그램의 메인 화면으로 지정하는 소스
                 <action android:name="android.intent.action.MAIN" />
-
+                // 앱을 실행할 때 제일 처음으로 나타나게 하는 소스
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity android:name=".ListActivity" />
+        <activity android:name=".MainActivity">
+
         </activity>
     </application>
 
