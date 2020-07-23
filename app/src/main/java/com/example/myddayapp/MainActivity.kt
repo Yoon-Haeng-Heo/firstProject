@@ -31,7 +31,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         //Glide.with(this).load(File("/storage/emulated/0/Pictures/KakaoTalk/1595329958618.jpg").toString()).into(imageView)
-
+        initData()
         loadData()
         openButton.setOnClickListener {
             askPermission()
@@ -101,16 +101,14 @@ class MainActivity : AppCompatActivity() {
             openGallery()
         }
     }
-    private fun getRealPathFromURI(uri: Uri): String? {
-        var columnIndex = 0
-        var proj = arrayOf(MediaStore.Images.Media.DATA)
-        var cursor = contentResolver.query(uri, proj, null, null, null)
-        if (cursor != null) {
-            if (cursor.moveToFirst()) {
-                columnIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
-            }
+    private fun initData(){
+        val pref = PreferenceManager.getDefaultSharedPreferences(this)
+        val editor = pref.edit()
+        var isFirstRun : Boolean = pref.getBoolean("isFirstRun", true)
+        if(isFirstRun) {
+            editor.putBoolean("isFirstRun", false).apply()
+            editor.putString("SaveUri","").apply()
         }
-        return cursor?.getString(columnIndex)
     }
     private fun saveData(uri : String?){
         val pref = PreferenceManager.getDefaultSharedPreferences(this)
@@ -120,9 +118,9 @@ class MainActivity : AppCompatActivity() {
     }
     private fun loadData()  {
         val pref = PreferenceManager.getDefaultSharedPreferences(this)
-        val saveuri = pref.getString("SaveUri","0")
-
-        if(saveuri != "0") {
+        val saveuri = pref.getString("SaveUri","")
+        Log.d("Test","${saveuri}")
+        if(saveuri != "") {
             val savepath = saveuri?.let { getUriFromPath(it) }
             try {
                 Glide.with(this).load(savepath).into(imageView)
@@ -154,7 +152,18 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun getUriFromPath(filePath: String): Uri? {
+    private fun getRealPathFromURI(uri: Uri): String? {
+        var columnIndex = 0
+        var proj = arrayOf(MediaStore.Images.Media.DATA)
+        var cursor = contentResolver.query(uri, proj, null, null, null)
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                columnIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
+            }
+        }
+        return cursor?.getString(columnIndex)
+    }
+    private fun getUriFromPath(filePath: String): Uri? {
         val cursor = contentResolver.query(
             MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
             null, "_data = '$filePath'", null, null
